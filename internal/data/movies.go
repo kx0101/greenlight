@@ -80,7 +80,7 @@ func (m MovieModel) Update(movie *Movie) error {
 	query := `
     update movies
     set title = $1, year = $2, runtime = $3, genres = $4, version = version + 1
-    where id = $5
+    where id = $5 and version = $6
     returning version
     `
 
@@ -90,9 +90,20 @@ func (m MovieModel) Update(movie *Movie) error {
 		movie.Runtime,
 		pq.Array(movie.Genres),
 		movie.ID,
+		movie.Version,
 	}
 
-	return m.DB.QueryRow(query, args...).Scan(&movie.Version)
+	err := m.DB.QueryRow(query, args...).Scan(&movie.Version)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrEditConflict
+		default:
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (m MovieModel) Delete(id int64) error {
@@ -115,11 +126,11 @@ func (m MovieModel) Delete(id int64) error {
 		return err
 	}
 
-    if rowsAffected == 0 {
-        return ErrRecordNotFound
-    }
+	if rowsAffected == 0 {
+		return ErrRecordNotFound
+	}
 
-    return nil
+	return nil
 }
 
 func ValidateMovie(v *validator.Validator, movie *Movie) {
