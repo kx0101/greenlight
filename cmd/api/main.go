@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"kx0101.greenlight/internal/data"
+	"kx0101.greenlight/internal/mailer"
 )
 
 const version = "1.0.0"
@@ -30,12 +31,20 @@ type config struct {
 		burst   int
 		enabled bool
 	}
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+		sender   string
+	}
 }
 
 type application struct {
 	config config
 	logger *slog.Logger
 	models data.Models
+	mailer mailer.Mailer
 }
 
 func main() {
@@ -61,6 +70,12 @@ func main() {
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limiter maximum burst")
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
+	flag.StringVar(&cfg.smtp.host, "smtp-host", "sandbox.smtp.mailtrap.io", "SMTP Host")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", 2525, "SMTP Port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "2c7c30290d03c6", "SMTP Username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "188b9270253a4f", "SMTP Password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@greenlight.elijahkx.net>", "SMTP Sender")
+
 	flag.Parse()
 
 	db, err := openDB(cfg)
@@ -77,6 +92,12 @@ func main() {
 		config: cfg,
 		logger: logger,
 		models: *data.NewModels(db),
+		mailer: mailer.New(cfg.smtp.host,
+			cfg.smtp.port,
+			cfg.smtp.username,
+			cfg.smtp.password,
+			cfg.smtp.sender,
+		),
 	}
 
 	mux := http.NewServeMux()
