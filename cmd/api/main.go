@@ -7,7 +7,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-    "sync"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -39,6 +40,9 @@ type config struct {
 		password string
 		sender   string
 	}
+	cors struct {
+		trustedOrigins []string
+	}
 }
 
 type application struct {
@@ -46,7 +50,7 @@ type application struct {
 	logger *slog.Logger
 	models data.Models
 	mailer mailer.Mailer
-    wg sync.WaitGroup
+	wg     sync.WaitGroup
 }
 
 func main() {
@@ -77,6 +81,11 @@ func main() {
 	flag.StringVar(&cfg.smtp.username, "smtp-username", "2c7c30290d03c6", "SMTP Username")
 	flag.StringVar(&cfg.smtp.password, "smtp-password", "188b9270253a4f", "SMTP Password")
 	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "Greenlight <no-reply@greenlight.elijahkx.net>", "SMTP Sender")
+
+	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(val string) error {
+		cfg.cors.trustedOrigins = strings.Fields(val)
+		return nil
+	})
 
 	flag.Parse()
 
