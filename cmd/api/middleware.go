@@ -4,13 +4,13 @@ import (
 	"errors"
 	"expvar"
 	"fmt"
-	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/tomasen/realip"
 	"golang.org/x/time/rate"
 	"kx0101.greenlight/internal/data"
 	"kx0101.greenlight/internal/validator"
@@ -24,8 +24,8 @@ type metricsResponseWriter struct {
 
 func newMetricsResponseWriter(w http.ResponseWriter) *metricsResponseWriter {
 	return &metricsResponseWriter{
-		ResponseWriter:    w,
-		statusCode: http.StatusOK,
+		ResponseWriter: w,
+		statusCode:     http.StatusOK,
 	}
 }
 
@@ -44,7 +44,7 @@ func (mw *metricsResponseWriter) Write(b []byte) (int, error) {
 }
 
 func (mw *metricsResponseWriter) Unwrap() http.ResponseWriter {
-    return mw.ResponseWriter
+	return mw.ResponseWriter
 }
 
 func (app *application) recoverPanic(next http.Handler) http.Handler {
@@ -90,11 +90,7 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if app.config.limiter.enabled {
-			ip, _, err := net.SplitHostPort(r.RemoteAddr)
-			if err != nil {
-				app.serverErrorResponse(w, r, err)
-				return
-			}
+			ip := realip.FromRequest(r)
 
 			mu.Lock()
 
