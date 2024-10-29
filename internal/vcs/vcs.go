@@ -6,8 +6,11 @@ import (
 )
 
 func Version() string {
-	var revision string
-	var modified bool
+	var (
+		revision string
+		time     string
+		modified bool
+	)
 
 	bi, ok := debug.ReadBuildInfo()
 	if ok {
@@ -15,6 +18,8 @@ func Version() string {
 			switch s.Key {
 			case "vcs.revision":
 				revision = s.Value
+			case "vcs.time":
+				time = s.Value
 			case "vcs.modified":
 				if s.Value == "true" {
 					modified = true
@@ -24,8 +29,8 @@ func Version() string {
 	}
 
 	if modified {
-		return fmt.Sprintf("%s-dirty", revision)
+		return fmt.Sprintf("%s-%s-dirty", time, revision)
 	}
 
-	return revision
+	return fmt.Sprintf("%s-%s", time, revision)
 }
