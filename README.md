@@ -1,3 +1,5 @@
+<img src="image.png" alt="make help" />
+
 This repository contains a comprehensive RESTful API project built in Go, designed as a structured, modular system ideal for modern web applications. The project follows a step-by-step approach, from initial setup to deployment, covering backend concepts and advanced functionality
 
 **Features**
