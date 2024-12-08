@@ -1,12 +1,8 @@
-This repository contains a comprehensive RESTful API project built in Go, designed as a structured, modular system ideal for modern web applications. The project follows a step-by-step approach, from initial setup to deployment, covering essential backend concepts and advanced functionality.
-
-**Introduction**
-
-This project serves as a guide to building scalable, secure, and performant APIs in Go, emphasizing best practices and a modular, extensible design. Each chapter of the project adds layers of capability, reliability, and scalability to the API, enabling you to create a robust web service.
+This repository contains a comprehensive RESTful API project built in Go, designed as a structured, modular system ideal for modern web applications. The project follows a step-by-step approach, from initial setup to deployment, covering backend concepts and advanced functionality
 
 **Features**
 
-- Modular Structure: Organized chapters for clear project progression.
+- Modular Structure
 - HTTP Server: Basic server setup with RESTful routing.
 - JSON Handling: Advanced JSON encoding/decoding, including error responses and custom formats.
 - Database Integration: PostgreSQL setup with connection pooling and SQL migrations.
