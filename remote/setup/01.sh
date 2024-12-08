@@ -62,6 +62,11 @@ apt --yes install fail2ban
 curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz
 mv migrate.linux-amd64 /usr/local/bin/migrate
 
+# Add the official postgresql repository to the APT because its not included in the ubuntu default repo
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update -y
+
 # Install PostgreSQL 14
 sudo apt --yes install postgresql-14
 
